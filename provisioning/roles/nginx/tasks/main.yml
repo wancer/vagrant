@@ -1,0 +1,23 @@
+---
+- name: Install Nginx
+  apt: pkg=nginx state=installed update_cache=true
+  register: nginxinstalled
+
+- name: Disable Default Site
+  when: nginxinstalled|success
+  file: dest=/etc/nginx/sites-enabled/default state=absent
+
+- name: Create Virtual Host Configuration
+  when: nginxinstalled|success
+  copy: src=default.j2 dest=/tmp/default.j2
+  register: sfhconfig
+
+- name: Copy Virtual Host Configuration
+  when: nginxinstalled|success
+  template: src=/tmp/default.j2 dest=/etc/nginx/sites-available/default owner=root group=root
+
+- name: Enable Site Config
+  file: src=/etc/nginx/sites-available/default dest=/etc/nginx/sites-enabled/default state=link
+
+- name: Restart Nginx
+  action: service name=nginx state=restarted

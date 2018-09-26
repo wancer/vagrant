@@ -1,0 +1,12 @@
+---
+- name: Install core packages
+  apt: name={{ item }} state=present
+  with_items:
+    - curl
+    - git
+    - zsh
+    - vim
+    - htop
+
+- name: Install oh-my-zsh
+  include: ./oh-my-zsh.yml
